@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+/.vs/JuliaSetVisualiser/v16
+/Debug
+/x64/Debug
