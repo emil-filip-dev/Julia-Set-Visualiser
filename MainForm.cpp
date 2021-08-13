@@ -5,7 +5,7 @@ using namespace System::Windows::Forms;
 using namespace JuliaSetVisualiser;
 
 [STAThread]
-void main(array<String^>^ args) {
+void main(cli::array<String^>^ args) {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(true);
 	MainForm form;

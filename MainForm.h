@@ -1,5 +1,7 @@
 #pragma once
 
+#include "JuliaSetRenderer.h"
+
 namespace JuliaSetVisualiser {
 
 	using namespace System;
@@ -44,8 +46,6 @@ namespace JuliaSetVisualiser {
 		System::ComponentModel::Container ^components;
 	private: System::Windows::Forms::Panel^ canvas;
 
-		Graphics^ graphics;
-
 #pragma region Windows Form Designer generated code
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -77,14 +77,16 @@ namespace JuliaSetVisualiser {
 
 		}
 #pragma endregion
-	private: System::Void MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
-		graphics = canvas->CreateGraphics();
-	}
 
-	private: System::Void canvas_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-		Brush^ b = gcnew SolidBrush(Color::Red);
-		graphics->FillRectangle(b, 0, 0, 100, 100);
-	}
+		JuliaSetRenderer^ renderer_;
+
+		System::Void MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
+			renderer_ = gcnew JuliaSetRenderer(canvas->CreateGraphics());
+		}
+
+		System::Void canvas_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+			renderer_->render(nullptr);
+		}
 
 	};
 }
