@@ -81,16 +81,29 @@ namespace JuliaSetVisualiser {
 		}
 #pragma endregion
 
+		Graphics^ juliaGraphics_;
+		Bitmap^ juliaImage_;
+
 		JuliaSet* juliaSet_;
 		JuliaSetRenderer^ renderer_;
 
 		System::Void MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
 			juliaSet_ = new JuliaSet(complex<double>(0.7885, 0) * exp(complex<double>(0, M_PI * 2.0 * 171.0 / 360.0)), 2.0);
-			renderer_ = gcnew JuliaSetRenderer(canvas->CreateGraphics());
+			renderer_ = gcnew JuliaSetRenderer(juliaSet_);
+			juliaGraphics_ = canvas->CreateGraphics();
 		}
 
 		System::Void canvas_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-			renderer_->render(juliaSet_);
+			if (!juliaImage_) {
+				updateJuliaImage();
+			}
+			juliaGraphics_->DrawImageUnscaled(juliaImage_, 0, 0);
+		}
+
+		void updateJuliaImage() {
+			juliaImage_ = gcnew Bitmap(juliaGraphics_->VisibleClipBounds.Width,
+				juliaGraphics_->VisibleClipBounds.Height);
+			renderer_->render(juliaImage_);
 		}
 
 	};
