@@ -58,23 +58,24 @@ namespace JuliaSetVisualiser {
 			// 
 			// canvas
 			// 
-			this->canvas->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
-				| System::Windows::Forms::AnchorStyles::Left)
-				| System::Windows::Forms::AnchorStyles::Right));
-			this->canvas->Location = System::Drawing::Point(12, 12);
+			this->canvas->Dock = System::Windows::Forms::DockStyle::Fill;
+			this->canvas->Location = System::Drawing::Point(0, 0);
 			this->canvas->Name = L"canvas";
-			this->canvas->Size = System::Drawing::Size(960, 937);
+			this->canvas->Size = System::Drawing::Size(684, 661);
 			this->canvas->TabIndex = 0;
+			this->canvas->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainForm::canvas_Paint);
 			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(984, 961);
+			this->ClientSize = System::Drawing::Size(684, 661);
 			this->Controls->Add(this->canvas);
 			this->Name = L"MainForm";
 			this->Text = L"Julia Set Visualiser";
+			this->FormClosed += gcnew System::Windows::Forms::FormClosedEventHandler(this, &MainForm::MainForm_FormClosed);
 			this->Load += gcnew System::EventHandler(this, &MainForm::MainForm_Load);
+			this->ResizeEnd += gcnew System::EventHandler(this, &MainForm::MainForm_ResizeEnd);
 			this->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainForm::canvas_Paint);
 			this->ResumeLayout(false);
 
@@ -85,26 +86,39 @@ namespace JuliaSetVisualiser {
 		Bitmap^ juliaImage_;
 
 		JuliaSet* juliaSet_;
-		JuliaSetRenderer^ renderer_;
+		JuliaSetRenderer* renderer_;
+
+		void updateJuliaImage() {
+			juliaGraphics_ = canvas->CreateGraphics();
+			juliaImage_ = gcnew Bitmap(juliaGraphics_->VisibleClipBounds.Width,
+				juliaGraphics_->VisibleClipBounds.Height);
+			renderer_->render(juliaImage_);
+		}
+
+		void paintJuliaSet() {
+			juliaGraphics_->DrawImageUnscaled(juliaImage_, 0, 0);
+		}
 
 		System::Void MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
 			juliaSet_ = new JuliaSet(complex<double>(0.7885, 0) * exp(complex<double>(0, M_PI * 2.0 * 171.0 / 360.0)), 2.0);
-			renderer_ = gcnew JuliaSetRenderer(juliaSet_);
-			juliaGraphics_ = canvas->CreateGraphics();
+			renderer_ = new JuliaSetRenderer(juliaSet_);
 		}
 
 		System::Void canvas_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 			if (!juliaImage_) {
 				updateJuliaImage();
 			}
-			juliaGraphics_->DrawImageUnscaled(juliaImage_, 0, 0);
+			paintJuliaSet();
 		}
 
-		void updateJuliaImage() {
-			juliaImage_ = gcnew Bitmap(juliaGraphics_->VisibleClipBounds.Width,
-				juliaGraphics_->VisibleClipBounds.Height);
-			renderer_->render(juliaImage_);
+		System::Void MainForm_FormClosed(System::Object^ sender, System::Windows::Forms::FormClosedEventArgs^ e) {
+			delete renderer_;
+			delete juliaSet_;
 		}
 
-	};
+		System::Void MainForm_ResizeEnd(System::Object^ sender, System::EventArgs^ e) {
+			updateJuliaImage();
+			paintJuliaSet();
+		}
+};
 }
