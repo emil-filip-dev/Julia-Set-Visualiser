@@ -8,11 +8,11 @@ namespace JuliaSetVisualiser {
 	public ref class JuliaSetRenderer {
 
 	public:
-		JuliaSetRenderer(Graphics^ ptr_graphics) : ptr_graphics_(ptr_graphics) {}
+		JuliaSetRenderer(Graphics^ ptr_graphics) : graphics_(ptr_graphics) {}
 
 		void render(JuliaSet* set);
 
 	private:
-		Graphics^ ptr_graphics_;
+		Graphics^ graphics_;
 	};
 }

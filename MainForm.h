@@ -58,16 +58,19 @@ namespace JuliaSetVisualiser {
 			// 
 			// canvas
 			// 
-			this->canvas->Location = System::Drawing::Point(37, 41);
+			this->canvas->Anchor = static_cast<System::Windows::Forms::AnchorStyles>((((System::Windows::Forms::AnchorStyles::Top | System::Windows::Forms::AnchorStyles::Bottom)
+				| System::Windows::Forms::AnchorStyles::Left)
+				| System::Windows::Forms::AnchorStyles::Right));
+			this->canvas->Location = System::Drawing::Point(12, 12);
 			this->canvas->Name = L"canvas";
-			this->canvas->Size = System::Drawing::Size(659, 542);
+			this->canvas->Size = System::Drawing::Size(960, 937);
 			this->canvas->TabIndex = 0;
 			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(725, 620);
+			this->ClientSize = System::Drawing::Size(984, 961);
 			this->Controls->Add(this->canvas);
 			this->Name = L"MainForm";
 			this->Text = L"Julia Set Visualiser";
@@ -78,14 +81,16 @@ namespace JuliaSetVisualiser {
 		}
 #pragma endregion
 
+		JuliaSet* juliaSet_;
 		JuliaSetRenderer^ renderer_;
 
 		System::Void MainForm_Load(System::Object^ sender, System::EventArgs^ e) {
+			juliaSet_ = new JuliaSet(complex<double>(0.7885, 0) * exp(complex<double>(0, M_PI * 2.0 * 171.0 / 360.0)), 2.0);
 			renderer_ = gcnew JuliaSetRenderer(canvas->CreateGraphics());
 		}
 
 		System::Void canvas_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-			renderer_->render(nullptr);
+			renderer_->render(juliaSet_);
 		}
 
 	};
