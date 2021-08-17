@@ -8,6 +8,11 @@ using namespace JuliaSetVisualiser;
 void main(cli::array<String^>^ args) {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(true);
-	MainForm form;
-	Application::Run(%form);
+
+	VisualiserController* controller = new VisualiserController();
+	MainForm^ form = gcnew MainForm(controller);
+
+	Application::Run(form);
+
+	delete controller;
 }
