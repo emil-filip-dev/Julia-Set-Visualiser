@@ -10,7 +10,7 @@ int iterate(double z_r, double z_i, double c_r, double c_i, double r, int maxIte
 {
 	int i = 0;
 	double zr_temp = 0;
-	for (i = 0; z_r * z_r + z_i * z_i < r * r && i < maxIterations; ++i) {
+	for (; z_r * z_r + z_i * z_i < r * r && i < maxIterations; ++i) {
 		zr_temp = z_r * z_r - z_i * z_i;
 		z_i = 2 * z_r * z_i + c_i;
 		z_r = zr_temp + c_r;
@@ -21,8 +21,8 @@ int iterate(double z_r, double z_i, double c_r, double c_i, double r, int maxIte
 uint32_t colourFromIterations(int iterations, int maxIterations) 
 {
 	uint32_t colour = 0xFF000000;
-	double ratio = iterations / (double)maxIterations;
-	if (ratio < 1.0) {
+	if (iterations < maxIterations) {
+		double ratio = iterations / (double)maxIterations;
 		ratio -= 0.5;
 		ratio = 1.0 - (ratio < 0.0 ? -ratio : ratio) / 0.5;
 		if (ratio < 0.25) {
@@ -69,7 +69,7 @@ void renderGPU(JuliaSet* set, uint32_t* colours, int width, int height, int maxI
 	double f_r = real(set->focus());
 	double f_i = imag(set->focus());
 	double c_r = real(set->c());
-	double c_i = imag(set->focus());
+	double c_i = imag(set->c());
 	double zoom = set->zoom();
 	double r = set->r();
 
@@ -85,7 +85,7 @@ void renderGPU(JuliaSet* set, uint32_t* colours, int width, int height, int maxI
 		double z_i = f_i + (y - height / 2.0) * zoom;
 		int i = 0;
 		double zr_temp = 0.0;
-		for (i = 0; z_r * z_r + z_i * z_i < r * r && i < maxIterations; ++i) {
+		for (; z_r * z_r + z_i * z_i < r * r && i < maxIterations; ++i) {
 			zr_temp = z_r * z_r - z_i * z_i;
 			z_i = 2 * z_r * z_i + c_i;
 			z_r = zr_temp + c_r;
@@ -96,8 +96,8 @@ void renderGPU(JuliaSet* set, uint32_t* colours, int width, int height, int maxI
 	BOOST_COMPUTE_CLOSURE(uint32_t, calcColour, (int iterations), (maxIterations),
 	{
 		int colour = 0xFF000000;
-		float ratio = iterations / (float)maxIterations;
-		if (ratio < 1.0) {
+		if (iterations < maxIterations) {
+			float ratio = iterations / (float)maxIterations;
 			ratio -= 0.5;
 			ratio = 1.0 - (ratio < 0.0 ? -ratio : ratio) / 0.5;
 			if (ratio < 0.25) {

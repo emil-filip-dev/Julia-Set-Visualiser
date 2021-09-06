@@ -74,12 +74,15 @@ namespace JuliaSetVisualiser {
 			this->Name = L"MainForm";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"Julia Set Visualiser";
-			this->MaximizedBoundsChanged += gcnew System::EventHandler(this, &MainForm::MainForm_MaximizedBoundsChanged);
+			this->ResizeBegin += gcnew System::EventHandler(this, &MainForm::MainForm_ResizeBegin);
 			this->ResizeEnd += gcnew System::EventHandler(this, &MainForm::MainForm_ResizeEnd);
+			this->SizeChanged += gcnew System::EventHandler(this, &MainForm::MainForm_SizeChanged);
 			this->ResumeLayout(false);
 
 		}
 #pragma endregion
+
+		bool finishedResizing_ = true;
 
 		VisualiserController* controller_;
 
@@ -88,11 +91,22 @@ namespace JuliaSetVisualiser {
 
 		JuliaSet* juliaSet_;
 
+		System::Void MainForm_ResizeBegin(System::Object^ sender, System::EventArgs^ e) {
+			finishedResizing_ = false;
+		}
+
+		System::Void MainForm_ResizeEnd(System::Object^ sender, System::EventArgs^ e) {
+			finishedResizing_ = true;
+			// MainForm_SizeChanged doesn't get called after this, so must update the image here too.
+			updateJuliaImage();
+			paintJuliaSet();
+		}
+
 		void updateJuliaImage() {
 			juliaGraphics_ = canvas->CreateGraphics();
 			juliaImage_ = gcnew Bitmap(juliaGraphics_->VisibleClipBounds.Width,
 				                       juliaGraphics_->VisibleClipBounds.Height);
-			controller_->render(juliaImage_, false);
+			controller_->render(juliaImage_, true);
 		}
 
 		void paintJuliaSet() {
@@ -106,14 +120,11 @@ namespace JuliaSetVisualiser {
 			paintJuliaSet();
 		}
 
-		System::Void MainForm_ResizeEnd(System::Object^ sender, System::EventArgs^ e) {
-			updateJuliaImage();
-			paintJuliaSet();
+		System::Void MainForm_SizeChanged(System::Object^ sender, System::EventArgs^ e) {
+			if (finishedResizing_) {
+				updateJuliaImage();
+				paintJuliaSet();
+			}
 		}
-		
-		System::Void MainForm_MaximizedBoundsChanged(System::Object^ sender, System::EventArgs^ e) {
-			updateJuliaImage();
-			paintJuliaSet();
-		}
-};
+	};
 }

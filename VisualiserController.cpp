@@ -1,6 +1,6 @@
 #include "VisualiserController.h"
 
-#define MAX_ITERATIONS 200000
+#define MAX_ITERATIONS 75
 
 namespace JuliaSetVisualiser {
 
