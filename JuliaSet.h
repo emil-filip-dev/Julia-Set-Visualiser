@@ -23,7 +23,7 @@ namespace JuliaSetVisualiser {
 		explicit JuliaSet(cdouble c, double r) : c_(c), r_(r) {}
 
 		bool isInSet(cdouble num, int maxIterations, int* iterations);
-		void render(uint32_t* colours, int width, int height, bool useCPU = false);
+		void render(uint32_t* colours, int width, int height, int maxIterations, bool useCPU = false);
 
 		auto c()       ->       cdouble& { return c_; }
 		auto c() const -> const cdouble& { return c_; }
@@ -34,8 +34,8 @@ namespace JuliaSetVisualiser {
 		auto zoom()       ->       double& { return zoomFactor_; }
 		auto zoom() const -> const double& { return zoomFactor_; }
 		
-		auto focus()       ->       cdouble& { return c_; }
-		auto focus() const -> const cdouble& { return c_; }
+		auto focus()       ->       cdouble& { return focus_; }
+		auto focus() const -> const cdouble& { return focus_; }
 	};
 
 }

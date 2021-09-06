@@ -11,8 +11,7 @@ namespace JuliaSetVisualiser {
 
 	public:
 		VisualiserController() {
-			//juliaSet_ = new JuliaSet(complex<double>(0.7885, 0) * exp(complex<double>(0, M_PI * 2.0 * 171.0 / 360.0)), 2.0);
-			juliaSet_ = new JuliaSet(cdouble(1, 0), 2.0);
+			juliaSet_ = new JuliaSet(complex<double>(0.7885, 0) * exp(complex<double>(0, M_PI * 2.0 * 170.0 / 360.0)), 2.0);
 		}
 
 		~VisualiserController() {

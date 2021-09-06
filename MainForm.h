@@ -74,9 +74,8 @@ namespace JuliaSetVisualiser {
 			this->Name = L"MainForm";
 			this->StartPosition = System::Windows::Forms::FormStartPosition::CenterScreen;
 			this->Text = L"Julia Set Visualiser";
-			this->WindowState = System::Windows::Forms::FormWindowState::Maximized;
+			this->MaximizedBoundsChanged += gcnew System::EventHandler(this, &MainForm::MainForm_MaximizedBoundsChanged);
 			this->ResizeEnd += gcnew System::EventHandler(this, &MainForm::MainForm_ResizeEnd);
-			this->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &MainForm::canvas_Paint);
 			this->ResumeLayout(false);
 
 		}
@@ -90,12 +89,10 @@ namespace JuliaSetVisualiser {
 		JuliaSet* juliaSet_;
 
 		void updateJuliaImage() {
-			if (!juliaGraphics_) {
-				juliaGraphics_ = canvas->CreateGraphics();
-			}
+			juliaGraphics_ = canvas->CreateGraphics();
 			juliaImage_ = gcnew Bitmap(juliaGraphics_->VisibleClipBounds.Width,
 				                       juliaGraphics_->VisibleClipBounds.Height);
-			controller_->render(juliaImage_, true);
+			controller_->render(juliaImage_, false);
 		}
 
 		void paintJuliaSet() {
@@ -113,5 +110,10 @@ namespace JuliaSetVisualiser {
 			updateJuliaImage();
 			paintJuliaSet();
 		}
-	};
+		
+		System::Void MainForm_MaximizedBoundsChanged(System::Object^ sender, System::EventArgs^ e) {
+			updateJuliaImage();
+			paintJuliaSet();
+		}
+};
 }
