@@ -1,6 +1,6 @@
 #include "JuliaSet.h"
-
 #include <boost/compute.hpp>
+#include <vector>
 
 using JuliaSetVisualiser::JuliaSet;
 
@@ -18,7 +18,7 @@ int iterate(double z_r, double z_i, double c_r, double c_i, double r, int maxIte
 	return i;
 }
 
-uint32_t colourFromIterations(int iterations, int maxIterations) 
+uint32_t calcColours(int iterations, int maxIterations) 
 {
 	uint32_t colour = 0xFF000000;
 	if (iterations < maxIterations) {
@@ -41,37 +41,37 @@ uint32_t colourFromIterations(int iterations, int maxIterations)
 	return colour;
 }
 
-void renderCPU(JuliaSet* set, uint32_t* colours, int width, int height, int maxIterations)
+void renderCPU(JuliaSet& set, std::vector<uint32_t>& pixelBuffer, int width, int height, int maxIterations)
 {
-	const cdouble focus = set->focus();
-	const double zoom = set->zoom();
+	const cdouble focus = set.focus;
+	const double zoom = set.zoom;
 	int iterations;
 	int ind = 0;
 	cdouble num;
 	for (int i = 0; i < width; i++) {
 		for (int j = 0; j < height; j++, ind++) {
 			num = focus + cdouble((i - width / 2.0) * zoom, (j - height / 2.0) * zoom);
-			if (set->isInSet(num, maxIterations, &iterations)) {
-				colours[ind] = 0xff000000;
+			if (set.isInSet(num, maxIterations, &iterations)) {
+				pixelBuffer[ind] = 0xff000000;
 			}
 			else {
-				colours[ind] = colourFromIterations(iterations, maxIterations);
+				pixelBuffer[ind] = calcColours(iterations, maxIterations);
 			}
 		}
 	}
 }
 
-void renderGPU(JuliaSet* set, uint32_t* colours, int width, int height, int maxIterations)
+void renderGPU(JuliaSet& set, std::vector<uint32_t>& pixelBuffer, int width, int height, int maxIterations)
 {
 	using compute::float2_;
 
 	int dataLength = width * height;
-	double f_r = real(set->focus());
-	double f_i = imag(set->focus());
-	double c_r = real(set->c());
-	double c_i = imag(set->c());
-	double zoom = set->zoom();
-	double r = set->r();
+	double f_r = real(set.focus);
+	double f_i = imag(set.focus);
+	double c_r = real(set.c);
+	double c_i = imag(set.c);
+	double zoom = set.zoom;
+	double r = set.r;
 
 	compute::vector<int> indexesVector(dataLength);
 	compute::vector<int> iterationsVector(dataLength);
@@ -119,26 +119,25 @@ void renderGPU(JuliaSet* set, uint32_t* colours, int width, int height, int maxI
 	compute::iota(indexesVector.begin(), indexesVector.end(), 0);
 	compute::transform(indexesVector.begin(), indexesVector.end(), iterationsVector.begin(), iterate);
 	compute::transform(iterationsVector.begin(), iterationsVector.end(), coloursVector.begin(), calcColour);
-	compute::copy(coloursVector.begin(), coloursVector.end(), colours);
+	compute::copy(coloursVector.begin(), coloursVector.end(), pixelBuffer.begin());
 }
 
 namespace JuliaSetVisualiser 
 {
-
 	bool JuliaSet::isInSet(cdouble num, int maxIterations, int* iterations) 
 	{
-		return maxIterations == (*iterations = iterate(real(num), imag(num), real(c_), imag(c_), r_, maxIterations));
+		return maxIterations == (*iterations = iterate(real(num), imag(num), real(c), imag(c), r, maxIterations));
 	}
 
-	void JuliaSet::render(uint32_t* colours, int width, int height, int maxIterations, bool useCPU)
+	void JuliaSet::render(std::vector<uint32_t>& pixelBuffer, int width, int height, int maxIterations, bool useCPU)
 	{
-		if (zoomFactor_ == 0.0) {
-			zoomFactor_ = 1 * r_ / std::min(width, height);
+		if (zoom == 0.0) {
+			zoom = 1 * r / std::min(width, height);
 		}
 		if (useCPU) {
-			renderCPU(this, colours, width, height, maxIterations);
+			renderCPU(*this, pixelBuffer, width, height, maxIterations);
 		} else {
-			renderGPU(this, colours, width, height, maxIterations);
+			renderGPU(*this, pixelBuffer, width, height, maxIterations);
 		}
 	}
 }

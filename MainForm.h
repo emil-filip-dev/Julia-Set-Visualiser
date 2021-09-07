@@ -91,36 +91,42 @@ namespace JuliaSetVisualiser {
 
 		JuliaSet* juliaSet_;
 
-		System::Void MainForm_ResizeBegin(System::Object^ sender, System::EventArgs^ e) {
+		System::Void MainForm_ResizeBegin(System::Object^ sender, System::EventArgs^ e) 
+		{
 			finishedResizing_ = false;
 		}
 
-		System::Void MainForm_ResizeEnd(System::Object^ sender, System::EventArgs^ e) {
+		System::Void MainForm_ResizeEnd(System::Object^ sender, System::EventArgs^ e) 
+		{
 			finishedResizing_ = true;
 			// MainForm_SizeChanged doesn't get called after this, so must update the image here too.
 			updateJuliaImage();
 			paintJuliaSet();
 		}
 
-		void updateJuliaImage() {
+		void updateJuliaImage() 
+		{
 			juliaGraphics_ = canvas->CreateGraphics();
 			juliaImage_ = gcnew Bitmap(juliaGraphics_->VisibleClipBounds.Width,
 				                       juliaGraphics_->VisibleClipBounds.Height);
-			controller_->render(juliaImage_, true);
+			controller_->render(juliaImage_, false);
 		}
 
-		void paintJuliaSet() {
+		void paintJuliaSet() 
+		{
 			juliaGraphics_->DrawImageUnscaled(juliaImage_, 0, 0);
 		}
 
-		System::Void canvas_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		System::Void canvas_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) 
+		{
 			if (!juliaImage_) {
 				updateJuliaImage();
 			}
 			paintJuliaSet();
 		}
 
-		System::Void MainForm_SizeChanged(System::Object^ sender, System::EventArgs^ e) {
+		System::Void MainForm_SizeChanged(System::Object^ sender, System::EventArgs^ e) 
+		{
 			if (finishedResizing_) {
 				updateJuliaImage();
 				paintJuliaSet();
