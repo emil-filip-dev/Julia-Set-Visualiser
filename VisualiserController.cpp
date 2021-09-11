@@ -1,7 +1,5 @@
 #include "VisualiserController.h"
 
-#define MAX_ITERATIONS 75
-
 namespace JuliaSetVisualiser 
 {
     void VisualiserController::render(Bitmap^ image, bool useCPU) 
@@ -15,7 +13,7 @@ namespace JuliaSetVisualiser
             pixelBuffer.resize(dataLength);
         }
 
-        juliaSet_->render(pixelBuffer, w, h, MAX_ITERATIONS, useCPU);
+        juliaSet_->render(pixelBuffer, w, h, renderIterations, useCPU);
 
         for (int i = 0; i < w * h; i++) {
             image->SetPixel(i / h, i % h, Color::FromArgb(pixelBuffer[i]));
